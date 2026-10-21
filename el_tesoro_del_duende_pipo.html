@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EL TESORO DEL DUENDE PIPO - 1.º GRADO</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Fredoka', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background: radial-gradient(circle at top, #1e3a2f 0%, #0f221a 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            60% { transform: scale(1.12); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px) rotate(-5deg); }
+            40%, 80% { transform: translateX(8px) rotate(5deg); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.7), 0 8px 0 #b45309; }
+            50% { box-shadow: 0 0 0 14px rgba(250, 204, 21, 0), 0 8px 0 #b45309; }
+        }
+        @keyframes levelBurst {
+            0%   { transform: scale(0.5) rotate(-10deg); opacity: 0; }
+            60%  { transform: scale(1.18) rotate(4deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes starPop {
+            0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+            70%  { transform: scale(1.3) rotate(6deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        @keyframes progressFill {
+            from { width: 0%; }
+            to   { width: 100%; }
+        }
+
+        .duende-anim { animation: float 3s ease-in-out infinite; }
+        .coin-pop    { animation: bounceIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .shake-error { animation: shake 0.45s ease-in-out; }
+
+        /* Monedas */
+        .coin {
+            cursor: grab;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+            position: relative;
+        }
+        .coin:hover  { transform: scale(1.12) translateY(-4px); }
+        .coin:active { cursor: grabbing; transform: scale(1.05); }
+        .coin-selected {
+            animation: pulseGlow 1.3s infinite;
+            transform: scale(1.18) translateY(-6px) !important;
+            z-index: 30;
+        }
+
+        .coin-1 {
+            background: radial-gradient(circle at 30% 30%, #fde047, #eab308 60%, #a16207 100%);
+            border: 4px solid #fef08a;
+            box-shadow: 0 6px 0 #854d0e, 0 8px 15px rgba(0,0,0,0.4);
+            color: #422006;
+        }
+        .coin-2 {
+            background: radial-gradient(circle at 30% 30%, #f8fafc, #cbd5e1 55%, #64748b 100%);
+            border: 5px solid #facc15;
+            box-shadow: 0 6px 0 #475569, 0 8px 15px rgba(0,0,0,0.4);
+            color: #0f172a;
+        }
+        .coin-5 {
+            background: radial-gradient(circle at 30% 30%, #fef08a, #f59e0b 55%, #b45309 100%);
+            border: 4px dashed #ffffff;
+            box-shadow: 0 6px 0 #78350f, 0 8px 15px rgba(0,0,0,0.4);
+            color: #451a03;
+        }
+
+        /* Saco */
+        .sack-wrapper {
+            position: relative;
+            padding-top: 38px;
+            transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.22s ease;
+            filter: drop-shadow(0 12px 14px rgba(0,0,0,0.55));
+        }
+        .sack-top-frill {
+            width: 118px; height: 44px;
+            margin: 0 auto -16px auto;
+            background: linear-gradient(180deg, #b45309 0%, #78350f 100%);
+            border: 4px solid #f59e0b; border-bottom: none;
+            border-radius: 38% 38% 18% 18% / 75% 75% 20% 20%;
+            position: relative; z-index: 1;
+            box-shadow: inset 0 5px 8px rgba(255,255,255,0.2);
+        }
+        .sack-rope {
+            width: 128px; height: 18px;
+            margin: 0 auto -9px auto;
+            background: repeating-linear-gradient(45deg,#fde047,#fde047 7px,#ca8a04 7px,#ca8a04 14px);
+            border: 3px solid #713f12; border-radius: 999px;
+            position: relative; z-index: 3;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.45);
+        }
+        .sack-belly {
+            background: radial-gradient(circle at 50% 32%, #a16207 0%, #78350f 62%, #451a03 100%);
+            border: 5px solid #d97706;
+            border-radius: 34% 34% 47% 47% / 24% 24% 68% 68%;
+            min-height: 225px; padding: 18px 20px 26px 20px;
+            position: relative; z-index: 2;
+            box-shadow: inset 0 10px 20px rgba(255,255,255,0.14), inset 0 -14px 24px rgba(0,0,0,0.55), 0 8px 0 #270e02;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .sack-wrapper.drag-over,
+        .sack-wrapper.ready-target:hover {
+            transform: translateY(-6px) scale(1.03);
+            filter: drop-shadow(0 0 20px rgba(253,224,71,0.65));
+        }
+        .sack-wrapper.drag-over .sack-belly,
+        .sack-wrapper.ready-target:hover .sack-belly { border-color: #fde047; }
+        .sack-wrapper.ring-highlight .sack-belly {
+            border-color: #fde047;
+            box-shadow: 0 0 0 6px rgba(250,204,21,0.55), inset 0 10px 20px rgba(255,255,255,0.2), 0 8px 0 #270e02;
+        }
+
+        /* Globo */
+        .speech-bubble {
+            position: relative;
+            background: #ffffff; color: #0f172a;
+            border: 4px solid #14532d; border-radius: 26px;
+            box-shadow: 0 8px 0 rgba(20,83,45,0.45), 0 12px 20px rgba(0,0,0,0.35);
+        }
+        @media (min-width: 640px) {
+            .speech-bubble::before {
+                content: ''; position: absolute; left: -24px; top: 38px;
+                border-width: 14px 24px 14px 0; border-style: solid;
+                border-color: transparent #14532d transparent transparent;
+            }
+            .speech-bubble::after {
+                content: ''; position: absolute; left: -17px; top: 41px;
+                border-width: 11px 19px 11px 0; border-style: solid;
+                border-color: transparent #ffffff transparent transparent;
+            }
+        }
+
+        /* Botones numéricos */
+        .num-btn {
+            background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+            border: 4px solid #94a3b8;
+            box-shadow: 0 7px 0 #475569, 0 10px 15px rgba(0,0,0,0.3);
+            transition: all 0.12s ease;
+        }
+        .num-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            background: linear-gradient(180deg, #fef9c3 0%, #fde047 100%);
+            border-color: #eab308;
+            box-shadow: 0 10px 0 #a16207;
+        }
+        .num-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 3px 0 #475569;
+        }
+        .num-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        /* Barra de nivel */
+        .level-bar-track {
+            background: #0f2d1a; border: 2px solid #16a34a;
+            border-radius: 999px; height: 14px; overflow: hidden;
+        }
+        .level-bar-fill {
+            height: 100%; border-radius: 999px;
+            background: linear-gradient(90deg, #22c55e, #86efac);
+            transition: width 0.6s ease;
+        }
+
+        /* Badge de nivel animado */
+        .level-badge-anim { animation: levelBurst 0.55s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .star-anim        { animation: starPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+        /* Modal overlay */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.82);
+            backdrop-filter: blur(6px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 50; padding: 1rem;
+        }
+        .modal-overlay.show { display: flex; }
+    </style>
+</head>
+<body class="text-white p-2 sm:p-4 flex flex-col justify-between min-h-screen">
+
+    <!-- BARRA SUPERIOR -->
+    <header class="max-w-6xl w-full mx-auto bg-emerald-950/90 border-2 border-emerald-600/60 rounded-2xl px-3 py-2 flex flex-wrap items-center justify-between gap-2 shadow-lg">
+
+        <!-- Título -->
+        <div class="flex items-center gap-3">
+            <span class="text-2xl sm:text-3xl">🍀</span>
+            <div>
+                <h1 class="text-lg sm:text-xl font-bold tracking-wide text-amber-300 leading-none">EL DUENDE PIPO</h1>
+                <span class="text-xs text-emerald-300 tracking-wider uppercase">CONTAR Y SUMAR MONEDAS</span>
+            </div>
+        </div>
+
+        <!-- Nivel actual -->
+        <div id="levelBadge" class="flex items-center gap-2 bg-emerald-900/80 border-2 border-emerald-400 rounded-xl px-4 py-1.5">
+            <span class="text-xs font-bold text-emerald-300 uppercase tracking-wide">NIVEL</span>
+            <span id="levelNum" class="text-2xl font-extrabold text-amber-300">1</span>
+            <span class="text-xs font-bold text-emerald-300 uppercase tracking-wide">de 6</span>
+        </div>
+
+        <!-- Barra de progreso rondas + Estrellas -->
+        <div class="flex items-center gap-3">
+            <div class="flex flex-col items-end gap-1">
+                <span class="text-xs text-emerald-300 font-bold">PROGRESO DEL NIVEL</span>
+                <div class="level-bar-track w-36 sm:w-48">
+                    <div id="levelProgressBar" class="level-bar-fill" style="width:0%"></div>
+                </div>
+                <span id="roundProgressText" class="text-xs text-emerald-400 font-bold">RONDA 1 de 3</span>
+            </div>
+            <div class="bg-amber-500/20 border-2 border-amber-400 rounded-xl px-3 py-1 flex items-center gap-1">
+                <span class="text-xl">⭐</span>
+                <span id="starCount" class="text-xl font-bold text-amber-300">0</span>
+            </div>
+        </div>
+
+        <!-- Botón nuevo juego -->
+        <button onclick="startNewRound()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs sm:text-sm px-3 py-1.5 rounded-xl shadow-md transition active:scale-95 flex items-center gap-1">
+            <span>🎲</span> NUEVA RONDA
+        </button>
+    </header>
+
+    <!-- CONTENIDO CENTRAL -->
+    <main class="max-w-6xl w-full mx-auto my-2 flex-1 flex flex-col justify-between gap-3">
+
+        <!-- FILA 1: DUENDE + GLOBO + COFRE -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center bg-emerald-900/40 border-2 border-emerald-700/60 rounded-3xl p-3 sm:p-4 shadow-xl">
+
+            <!-- Duende y globo -->
+            <div class="lg:col-span-6 flex flex-col sm:flex-row items-center gap-4">
+
+                <!-- Imagen del duende -->
+                <div class="w-36 h-40 sm:w-44 sm:h-48 flex-shrink-0 duende-anim relative flex items-center justify-center" id="goblinAvatar">
+                    <img src="duende_pipo.png" alt="Duende Pipo"
+                         class="w-full h-full object-contain drop-shadow-2xl"
+                         onerror="this.onerror=null;this.src='data:image/svg+xml,<svg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'><text y=\'.9em\' font-size=\'90\'>🧙</text></svg>';" />
+                </div>
+
+                <!-- Globo de texto -->
+                <div class="speech-bubble flex-1 p-3.5 sm:p-4">
+                    <div class="flex items-center justify-between gap-2 mb-1.5">
+                        <span class="text-xs font-extrabold bg-emerald-700 text-amber-300 px-2.5 py-0.5 rounded-full uppercase tracking-wide">
+                            DUENDE PIPO DICE:
+                        </span>
+                        <button onclick="speakCurrentInstruction()" class="bg-sky-400 hover:bg-sky-300 text-slate-950 font-extrabold text-xs px-3 py-1 rounded-full flex items-center gap-1 shadow transition active:scale-95">
+                            <span>🔊</span> ESCUCHAR
+                        </button>
+                    </div>
+                    <p id="goblinSpeech" class="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">
+                        ¡HOLA! GUARDÁ CADA MONEDA EN SU BOLSA IGUAL.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Cofre de monedas -->
+            <div class="lg:col-span-6 bg-amber-950/70 border-4 border-amber-600/80 rounded-2xl p-3 min-h-[136px] flex flex-col justify-between relative shadow-inner">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-1.5">
+                        <span>👑</span> COFRE DEL TESORO
+                    </span>
+                    <span id="remainingBadge" class="text-xs font-bold bg-amber-500/30 border border-amber-400 text-amber-200 px-2.5 py-0.5 rounded-full">
+                        FALTAN: 0
+                    </span>
+                </div>
+                <div id="chestCoinsContainer" class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 py-2 min-h-[82px]">
+                </div>
+            </div>
+        </section>
+
+        <!-- FILA 2: BOLSAS -->
+        <section id="bagsSection" class="grid grid-cols-1 md:grid-cols-3 gap-6 px-2 sm:px-6 my-1">
+
+            <!-- SACO $1 -->
+            <div id="bag-1" onclick="handleBagClick(1)" ondragover="handleDragOver(event,1)" ondragleave="handleDragLeave(event,1)" ondrop="handleDrop(event,1)"
+                 class="sack-wrapper cursor-pointer select-none">
+                <div class="sack-top-frill"></div>
+                <div class="sack-rope"></div>
+                <div class="sack-belly">
+                    <div class="flex items-center gap-2 bg-amber-950/80 border-2 border-amber-500 px-4 py-1 rounded-full shadow">
+                        <div class="w-9 h-9 rounded-full coin-1 flex items-center justify-center font-extrabold text-base shadow">$1</div>
+                        <h2 class="text-base sm:text-lg font-extrabold text-amber-200">BOLSA DE $1</h2>
+                    </div>
+                    <div id="bagCoins-1" class="flex flex-wrap items-center justify-center gap-2.5 py-3 my-auto min-h-[105px] w-full"></div>
+                </div>
+            </div>
+
+            <!-- SACO $2 -->
+            <div id="bag-2" onclick="handleBagClick(2)" ondragover="handleDragOver(event,2)" ondragleave="handleDragLeave(event,2)" ondrop="handleDrop(event,2)"
+                 class="sack-wrapper cursor-pointer select-none">
+                <div class="sack-top-frill"></div>
+                <div class="sack-rope"></div>
+                <div class="sack-belly">
+                    <div class="flex items-center gap-2 bg-amber-950/80 border-2 border-amber-500 px-4 py-1 rounded-full shadow">
+                        <div class="w-9 h-9 rounded-full coin-2 flex items-center justify-center font-extrabold text-base shadow">$2</div>
+                        <h2 class="text-base sm:text-lg font-extrabold text-slate-100">BOLSA DE $2</h2>
+                    </div>
+                    <div id="bagCoins-2" class="flex flex-wrap items-center justify-center gap-2.5 py-3 my-auto min-h-[105px] w-full"></div>
+                </div>
+            </div>
+
+            <!-- SACO $5 -->
+            <div id="bag-5" onclick="handleBagClick(5)" ondragover="handleDragOver(event,5)" ondragleave="handleDragLeave(event,5)" ondrop="handleDrop(event,5)"
+                 class="sack-wrapper cursor-pointer select-none">
+                <div class="sack-top-frill"></div>
+                <div class="sack-rope"></div>
+                <div class="sack-belly">
+                    <div class="flex items-center gap-2 bg-amber-950/80 border-2 border-amber-500 px-4 py-1 rounded-full shadow">
+                        <div class="w-9 h-9 rounded-full coin-5 flex items-center justify-center font-extrabold text-base shadow">$5</div>
+                        <h2 class="text-base sm:text-lg font-extrabold text-yellow-300">BOLSA DE $5</h2>
+                    </div>
+                    <div id="bagCoins-5" class="flex flex-wrap items-center justify-center gap-2.5 py-3 my-auto min-h-[105px] w-full"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILA 3: PANEL PREGUNTA + BOTONERA -->
+        <section id="questionPanel" class="bg-slate-900/95 border-4 border-amber-400 rounded-3xl p-3 sm:p-4 shadow-2xl transition-all duration-300">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-3">
+                <div class="flex items-center gap-3 flex-wrap justify-center">
+                    <span id="phaseStepBadge" class="bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm px-3 py-1 rounded-full">
+                        PASO 1: GUARDAR MONEDAS
+                    </span>
+                    <div id="questionDisplay" class="flex items-center flex-wrap justify-center gap-2 text-lg sm:text-2xl font-extrabold text-white">
+                        <span>PRIMERO METÉ TODAS LAS MONEDAS EN SUS BOLSAS</span>
+                    </div>
+                </div>
+                <button onclick="speakQuestion()" class="bg-sky-400 hover:bg-sky-300 text-slate-950 font-extrabold text-sm sm:text-base px-4 py-2 rounded-2xl shadow-md flex items-center gap-2 transition active:scale-95 flex-shrink-0">
+                    <span class="text-xl">🔊</span> LEER PREGUNTA
+                </button>
+            </div>
+            <div id="numberPad" class="grid grid-cols-6 sm:grid-cols-11 gap-2 sm:gap-2.5 pt-1">
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MODAL VICTORIA RONDA -->
+    <div id="victoryModal" class="modal-overlay">
+        <div class="bg-gradient-to-b from-emerald-800 to-emerald-950 border-4 border-amber-400 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl coin-pop">
+            <div class="text-6xl mb-2">🎉🪙🎉</div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-amber-300 mb-2">¡EXCELENTE TRABAJO!</h2>
+            <p id="victoryMessage" class="text-base sm:text-lg font-bold text-white mb-4">¡MUY BIEN!</p>
+            <div id="nextLevelInfo" class="bg-emerald-900/90 border-2 border-emerald-500 rounded-2xl p-3 mb-5 text-sm font-bold text-amber-200 hidden"></div>
+            <button id="victoryBtn" onclick="onVictoryNext()" class="w-full bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-xl py-3.5 rounded-2xl shadow-lg transition active:scale-95">
+                🚀 SIGUIENTE
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL NIVEL COMPLETADO -->
+    <div id="levelModal" class="modal-overlay">
+        <div class="bg-gradient-to-b from-amber-700 to-amber-950 border-4 border-yellow-300 rounded-3xl max-w-lg w-full p-8 text-center shadow-2xl" style="animation: levelBurst 0.6s cubic-bezier(0.34,1.56,0.64,1)">
+            <div class="text-7xl mb-3">🏆</div>
+            <h2 id="levelModalTitle" class="text-3xl sm:text-4xl font-extrabold text-yellow-300 mb-2">¡NIVEL COMPLETADO!</h2>
+            <p id="levelModalDesc" class="text-lg font-bold text-white mb-6">¡Pasás al siguiente nivel!</p>
+            <div class="flex justify-center gap-2 mb-6" id="levelStars"></div>
+            <button id="levelModalBtn" onclick="onLevelModalNext()" class="w-full bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-extrabold text-xl py-4 rounded-2xl shadow-lg transition active:scale-95">
+                🌟 ¡SIGUIENTE NIVEL!
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL JUEGO COMPLETO -->
+    <div id="gameCompleteModal" class="modal-overlay">
+        <div class="bg-gradient-to-b from-purple-800 to-purple-950 border-4 border-pink-400 rounded-3xl max-w-lg w-full p-8 text-center shadow-2xl" style="animation: levelBurst 0.6s cubic-bezier(0.34,1.56,0.64,1)">
+            <div class="text-8xl mb-4">🎊🏅🎊</div>
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-pink-300 mb-3">¡COMPLETASTE EL JUEGO!</h2>
+            <p class="text-lg font-bold text-white mb-2">¡Sos un CAMPEÓN del Duende Pipo!</p>
+            <p id="finalStarsText" class="text-2xl font-extrabold text-yellow-300 mb-6"></p>
+            <button onclick="restartFullGame()" class="w-full bg-pink-400 hover:bg-pink-300 text-slate-950 font-extrabold text-xl py-4 rounded-2xl shadow-lg transition active:scale-95">
+                🔄 JUGAR DE NUEVO
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURACIÓN DE LOS 6 NIVELES
+        // ==========================================
+        // Cada nivel tiene: descripción, roundsToComplete, y una función generadora de monedas y pregunta
+        const LEVEL_CONFIGS = [
+            {
+                // NIVEL 1: Solo monedas de $1, clasificar y contar (hasta 5)
+                label: "NIVEL 1 – Solo monedas de $1",
+                roundsToComplete: 3,
+                coinTypes: [1],
+                generate() {
+                    const count1 = randInt(2, 5);
+                    const coins = [];
+                    for (let i = 0; i < count1; i++) coins.push({ value: 1 });
+                    const question = {
+                        type: 'single', value: 1,
+                        correctCount: count1,
+                        speechText: `¿Cuántas monedas de 1 peso hay en la bolsa?`
+                    };
+                    const speech = `¡GUARDÁ TODAS LAS MONEDAS DE $1 EN SU BOLSA!`;
+                    return { coins, question, speech };
+                }
+            },
+            {
+                // NIVEL 2: Monedas de $1 y $2, contar una de las dos bolsas
+                label: "NIVEL 2 – Monedas de $1 y $2",
+                roundsToComplete: 3,
+                coinTypes: [1, 2],
+                generate() {
+                    const count1 = randInt(2, 5);
+                    const count2 = randInt(2, 5);
+                    const coins = [];
+                    for (let i = 0; i < count1; i++) coins.push({ value: 1 });
+                    for (let i = 0; i < count2; i++) coins.push({ value: 2 });
+                    const chosenVal = Math.random() < 0.5 ? 1 : 2;
+                    const question = {
+                        type: 'single', value: chosenVal,
+                        correctCount: chosenVal === 1 ? count1 : count2,
+                        speechText: `¿Cuántas monedas de ${chosenVal} ${chosenVal === 1 ? 'peso' : 'pesos'} hay en su bolsa?`
+                    };
+                    const speech = `¡GUARDÁ CADA MONEDA EN SU BOLSA! $1 CON $1 Y $2 CON $2.`;
+                    return { coins, question, speech };
+                }
+            },
+            {
+                // NIVEL 3: Las 3 monedas, contar una bolsa
+                label: "NIVEL 3 – Tres tipos de monedas",
+                roundsToComplete: 3,
+                coinTypes: [1, 2, 5],
+                generate() {
+                    const count1 = randInt(2, 4);
+                    const count2 = randInt(2, 4);
+                    const count5 = randInt(1, 3);
+                    const coins = [];
+                    for (let i = 0; i < count1; i++) coins.push({ value: 1 });
+                    for (let i = 0; i < count2; i++) coins.push({ value: 2 });
+                    for (let i = 0; i < count5; i++) coins.push({ value: 5 });
+                    const vals = [1, 2, 5];
+                    const chosenVal = vals[randInt(0, 2)];
+                    const countsMap = { 1: count1, 2: count2, 5: count5 };
+                    const question = {
+                        type: 'single', value: chosenVal,
+                        correctCount: countsMap[chosenVal],
+                        speechText: `¿Cuántas monedas de ${chosenVal} ${chosenVal === 1 ? 'peso' : 'pesos'} hay en su bolsa?`
+                    };
+                    const speech = `¡HAY TRES TIPOS DE MONEDAS! ORDENÁ CADA UNA EN SU BOLSA.`;
+                    return { coins, question, speech };
+                }
+            },
+            {
+                // NIVEL 4: Las 3 monedas, contar TOTAL de monedas (suma de las 3 bolsas)
+                label: "NIVEL 4 – Contar el total de monedas",
+                roundsToComplete: 3,
+                coinTypes: [1, 2, 5],
+                generate() {
+                    const count1 = randInt(2, 4);
+                    const count2 = randInt(2, 3);
+                    const count5 = randInt(1, 3);
+                    const coins = [];
+                    for (let i = 0; i < count1; i++) coins.push({ value: 1 });
+                    for (let i = 0; i < count2; i++) coins.push({ value: 2 });
+                    for (let i = 0; i < count5; i++) coins.push({ value: 5 });
+                    const total = count1 + count2 + count5;
+                    const question = {
+                        type: 'total', value: null,
+                        correctCount: total,
+                        speechText: `¿Cuántas monedas hay en total sumando todas las bolsas?`
+                    };
+                    const speech = `¡GUARDÁ TODAS LAS MONEDAS! DESPUÉS VAMOS A CONTAR CUÁNTAS HAY EN TOTAL.`;
+                    return { coins, question, speech };
+                }
+            },
+            {
+                // NIVEL 5: Suma de los VALORES de una bolsa (p.ej. 3 monedas de $2 = $6)
+                label: "NIVEL 5 – Sumar los pesos de una bolsa",
+                roundsToComplete: 3,
+                coinTypes: [1, 2, 5],
+                generate() {
+                    const count1 = randInt(1, 5);
+                    const count2 = randInt(1, 4);
+                    const count5 = randInt(1, 2);
+                    const coins = [];
+                    for (let i = 0; i < count1; i++) coins.push({ value: 1 });
+                    for (let i = 0; i < count2; i++) coins.push({ value: 2 });
+                    for (let i = 0; i < count5; i++) coins.push({ value: 5 });
+                    // Preguntar la suma de los valores de UNA bolsa
+                    const vals = [1, 2, 5];
+                    const chosenVal = vals[randInt(0, 2)];
+                    const countsMap = { 1: count1, 2: count2, 5: count5 };
+                    const chosenCount = countsMap[chosenVal];
+                    const totalValue = chosenVal * chosenCount;
+                    const question = {
+                        type: 'sum_bag', value: chosenVal,
+                        correctCount: totalValue,
+                        speechText: `¿Cuánto dinero hay en total en la bolsa de ${chosenVal} ${chosenVal === 1 ? 'peso' : 'pesos'}?`
+                    };
+                    const speech = `¡GUARDÁ LAS MONEDAS Y DESPUÉS SUMÁ CUÁNTOS PESOS HAY EN UNA BOLSA!`;
+                    return { coins, question, speech };
+                }
+            },
+            {
+                // NIVEL 6: Suma total de DINERO en las 3 bolsas
+                label: "NIVEL 6 – Sumar todo el dinero",
+                roundsToComplete: 3,
+                coinTypes: [1, 2, 5],
+                generate() {
+                    // Restringimos para que el total no supere 15 (accesible para 1.º grado)
+                    let count1, count2, count5, total;
+                    do {
+                        count1 = randInt(1, 3);
+                        count2 = randInt(1, 3);
+                        count5 = randInt(1, 2);
+                        total = count1 * 1 + count2 * 2 + count5 * 5;
+                    } while (total > 15);
+                    const coins = [];
+                    for (let i = 0; i < count1; i++) coins.push({ value: 1 });
+                    for (let i = 0; i < count2; i++) coins.push({ value: 2 });
+                    for (let i = 0; i < count5; i++) coins.push({ value: 5 });
+                    const question = {
+                        type: 'sum_all', value: null,
+                        correctCount: total,
+                        speechText: `¿Cuántos pesos hay en total sumando todas las monedas de las tres bolsas?`
+                    };
+                    const speech = `¡ESTE ES EL GRAN DESAFÍO! GUARDÁ LAS MONEDAS Y SUMÁ TODO EL DINERO.`;
+                    return { coins, question, speech };
+                }
+            }
+        ];
+
+        // Máximo valor posible en el teclado numérico (ajustado por nivel)
+        function getMaxPadValue(level) {
+            const maxPerLevel = [10, 10, 10, 10, 15, 15];
+            return maxPerLevel[level - 1] || 10;
+        }
+
+        // ==========================================
+        // ESTADO DEL JUEGO
+        // ==========================================
+        let currentLevel    = 1;  // 1-6
+        let roundInLevel    = 0;  // 0-based
+        let stars           = 0;
+        let coinsInChest    = []; // [{ id, value }]
+        let bags            = { 1: [], 2: [], 5: [] };
+        let selectedCoinId  = null;
+        let targetQuestion  = {};
+        let isSortingComplete = false;
+
+        // ==========================================
+        // AUDIO
+        // ==========================================
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                const AC = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AC();
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        function playCoinSound() {
+            initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(987.77, now);
+            osc.frequency.setValueAtTime(1318.51, now + 0.07);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(now); osc.stop(now + 0.35);
+        }
+        function playErrorSound() {
+            initAudio();
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(260, now);
+            osc.frequency.linearRampToValueAtTime(180, now + 0.25);
+            gain.gain.setValueAtTime(0.22, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(now); osc.stop(now + 0.28);
+        }
+        function playVictorySound() {
+            initAudio();
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                const now = audioCtx.currentTime + idx * 0.11;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.3);
+            });
+        }
+        function playLevelUpSound() {
+            initAudio();
+            [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, idx) => {
+                const now = audioCtx.currentTime + idx * 0.13;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now);
+                gain.gain.setValueAtTime(0.28, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(now); osc.stop(now + 0.35);
+            });
+        }
+
+        // ==========================================
+        // SÍNTESIS DE VOZ
+        // ==========================================
+        function speakText(text) {
+            if (!('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'es-AR'; u.rate = 0.92; u.pitch = 1.15;
+            window.speechSynthesis.speak(u);
+        }
+        function speakCurrentInstruction() {
+            speakText(document.getElementById('goblinSpeech').innerText);
+        }
+        function speakQuestion() {
+            if (!isSortingComplete) {
+                speakText("Primero guardá todas las monedas del cofre en su bolsa igual.");
+            } else {
+                speakText(targetQuestion.speechText);
+            }
+        }
+
+        // ==========================================
+        // UTILIDADES
+        // ==========================================
+        function randInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        function setGoblinMessage(text) {
+            document.getElementById('goblinSpeech').innerText = text;
+        }
+
+        // ==========================================
+        // INICIAR RONDA
+        // ==========================================
+        function startNewRound() {
+            selectedCoinId = null;
+            isSortingComplete = false;
+            bags = { 1: [], 2: [], 5: [] };
+            coinsInChest = [];
+
+            const config = LEVEL_CONFIGS[currentLevel - 1];
+            const generated = config.generate();
+
+            // Asignar IDs a las monedas y mezclar
+            let idCounter = 1;
+            coinsInChest = generated.coins.map(c => ({ id: idCounter++, value: c.value }));
+            coinsInChest.sort(() => Math.random() - 0.5);
+
+            targetQuestion = generated.question;
+
+            setGoblinMessage(generated.speech);
+
+            // Mostrar/ocultar bolsas según qué tipos de monedas hay en este nivel
+            const activeCoinTypes = config.coinTypes;
+            [1, 2, 5].forEach(v => {
+                const bagEl = document.getElementById(`bag-${v}`);
+                bagEl.style.display = activeCoinTypes.includes(v) ? '' : 'none';
+            });
+
+            updateHeaderUI();
+            buildNumberPad();
+            renderAll();
+            updateQuestionPanelUI();
+        }
+
+        // ==========================================
+        // UI HEADER
+        // ==========================================
+        function updateHeaderUI() {
+            document.getElementById('levelNum').innerText = currentLevel;
+            const config = LEVEL_CONFIGS[currentLevel - 1];
+            const progress = (roundInLevel / config.roundsToComplete) * 100;
+            document.getElementById('levelProgressBar').style.width = progress + '%';
+            document.getElementById('roundProgressText').innerText =
+                `RONDA ${roundInLevel + 1} de ${config.roundsToComplete}`;
+        }
+
+        // ==========================================
+        // TECLADO NUMÉRICO
+        // ==========================================
+        function buildNumberPad() {
+            const pad = document.getElementById('numberPad');
+            pad.innerHTML = '';
+            const maxVal = getMaxPadValue(currentLevel);
+            // Número de columnas dinámico
+            pad.className = maxVal <= 10
+                ? 'grid grid-cols-6 sm:grid-cols-11 gap-2 sm:gap-2.5 pt-1'
+                : 'grid grid-cols-8 sm:grid-cols-16 gap-2 pt-1';
+
+            for (let i = 0; i <= maxVal; i++) {
+                const btn = document.createElement('button');
+                btn.id = `numBtn-${i}`;
+                btn.disabled = true;
+                btn.className = 'num-btn rounded-2xl py-2.5 sm:py-3 text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center justify-center';
+                btn.innerText = i;
+                btn.onclick = () => checkNumberAnswer(i);
+                pad.appendChild(btn);
+            }
+        }
+
+        // ==========================================
+        // RENDERIZADO VISUAL
+        // ==========================================
+        function renderAll() {
+            const chestEl = document.getElementById('chestCoinsContainer');
+            chestEl.innerHTML = '';
+            document.getElementById('remainingBadge').innerText = `FALTAN: ${coinsInChest.length}`;
+
+            if (coinsInChest.length === 0) {
+                chestEl.innerHTML = `
+                    <div class="text-emerald-300 font-extrabold text-base sm:text-lg flex items-center gap-2 coin-pop">
+                        <span>✨</span> ¡COFRE VACÍO! TODAS LAS MONEDAS ESTÁN EN SUS BOLSAS <span>✨</span>
+                    </div>`;
+            } else {
+                coinsInChest.forEach(coin => {
+                    const el = document.createElement('div');
+                    const isSel = selectedCoinId === coin.id;
+                    el.className = `coin coin-${coin.value} ${isSel ? 'coin-selected' : ''} w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center font-extrabold text-xl sm:text-2xl select-none`;
+                    el.draggable = true;
+                    el.innerHTML = `$${coin.value}`;
+                    el.ondragstart = (e) => {
+                        selectedCoinId = coin.id;
+                        e.dataTransfer.setData('text/plain', coin.id);
+                    };
+                    el.onclick = (e) => {
+                        e.stopPropagation();
+                        initAudio();
+                        if (selectedCoinId === coin.id) {
+                            selectedCoinId = null;
+                        } else {
+                            selectedCoinId = coin.id;
+                            playCoinSound();
+                            setGoblinMessage(`ELEGISTE LA MONEDA DE $${coin.value}. ¡AHORA TOCÁ LA BOLSA DE $${coin.value}!`);
+                        }
+                        renderAll();
+                    };
+                    chestEl.appendChild(el);
+                });
+            }
+
+            [1, 2, 5].forEach(val => {
+                const bagContainer = document.getElementById(`bagCoins-${val}`);
+                const bagCard = document.getElementById(`bag-${val}`);
+                if (!bagContainer) return;
+                bagContainer.innerHTML = '';
+                if (selectedCoinId !== null) {
+                    bagCard.classList.add('ready-target');
+                } else {
+                    bagCard.classList.remove('ready-target');
+                }
+                bags[val].forEach(() => {
+                    const s = document.createElement('div');
+                    s.className = `coin-${val} coin-pop w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center font-extrabold text-lg sm:text-xl shadow-md`;
+                    s.innerHTML = `<span>$${val}</span>`;
+                    bagContainer.appendChild(s);
+                });
+            });
+        }
+
+        // ==========================================
+        // DRAG & DROP / CLICK EN BOLSA
+        // ==========================================
+        function handleDragOver(e, bagValue) {
+            e.preventDefault();
+            document.getElementById(`bag-${bagValue}`).classList.add('drag-over');
+        }
+        function handleDragLeave(e, bagValue) {
+            document.getElementById(`bag-${bagValue}`).classList.remove('drag-over');
+        }
+        function handleDrop(e, bagValue) {
+            e.preventDefault();
+            document.getElementById(`bag-${bagValue}`).classList.remove('drag-over');
+            const coinId = parseInt(e.dataTransfer.getData('text/plain'), 10) || selectedCoinId;
+            if (coinId) tryPlaceCoinInBag(coinId, bagValue);
+        }
+        function handleBagClick(bagValue) {
+            if (selectedCoinId !== null) tryPlaceCoinInBag(selectedCoinId, bagValue);
+        }
+
+        function tryPlaceCoinInBag(coinId, bagValue) {
+            const coinIndex = coinsInChest.findIndex(c => c.id === coinId);
+            if (coinIndex === -1) return;
+            const coin = coinsInChest[coinIndex];
+
+            if (coin.value === bagValue) {
+                playCoinSound();
+                coinsInChest.splice(coinIndex, 1);
+                bags[bagValue].push({ ...coin });
+                selectedCoinId = null;
+                if (coinsInChest.length === 0) {
+                    onAllCoinsSorted();
+                } else {
+                    setGoblinMessage(`¡MUY BIEN! GUARDAMOS LA MONEDA DE $${bagValue} EN SU BOLSA.`);
+                }
+                renderAll();
+            } else {
+                playErrorSound();
+                const bagEl = document.getElementById(`bag-${bagValue}`);
+                bagEl.classList.remove('shake-error');
+                void bagEl.offsetWidth;
+                bagEl.classList.add('shake-error');
+                const msg = `¡UY! ESA MONEDA ES DE $${coin.value}. ¡VA EN LA BOLSA DE $${coin.value}!`;
+                setGoblinMessage(msg);
+                speakText(msg);
+                selectedCoinId = null;
+                renderAll();
+            }
+        }
+
+        // ==========================================
+        // FASE 2: PREGUNTA
+        // ==========================================
+        function onAllCoinsSorted() {
+            isSortingComplete = true;
+            updateQuestionPanelUI();
+
+            let questionTextForBubble;
+            if (targetQuestion.type === 'single') {
+                questionTextForBubble = `¡LISTO! ¿CUÁNTAS MONEDAS DE $${targetQuestion.value} HAY? ELEGÍ EL NÚMERO ABAJO.`;
+            } else if (targetQuestion.type === 'total') {
+                questionTextForBubble = `¡LISTO! ¿CUÁNTAS MONEDAS HAY EN TOTAL EN LAS 3 BOLSAS?`;
+            } else if (targetQuestion.type === 'sum_bag') {
+                questionTextForBubble = `¡LISTO! ¿CUÁNTOS PESOS HAY EN LA BOLSA DE $${targetQuestion.value}? SUMÁ Y ELEGÍ EL NÚMERO.`;
+            } else {
+                questionTextForBubble = `¡LISTO! ¿CUÁNTOS PESOS HAY EN TOTAL EN LAS 3 BOLSAS?`;
+            }
+
+            setGoblinMessage(questionTextForBubble);
+            setTimeout(() => speakQuestion(), 350);
+        }
+
+        function updateQuestionPanelUI() {
+            const stepBadge = document.getElementById('phaseStepBadge');
+            const questionDisplay = document.getElementById('questionDisplay');
+            const maxVal = getMaxPadValue(currentLevel);
+
+            for (let i = 0; i <= maxVal; i++) {
+                const btn = document.getElementById(`numBtn-${i}`);
+                if (btn) btn.disabled = !isSortingComplete;
+            }
+
+            if (!isSortingComplete) {
+                stepBadge.innerText = 'PASO 1: GUARDAR MONEDAS';
+                stepBadge.className = 'bg-amber-400 text-slate-950 font-extrabold text-xs sm:text-sm px-3 py-1 rounded-full';
+                questionDisplay.innerHTML = `<span class="text-amber-200">GUARDÁ TODAS LAS MONEDAS EN SUS BOLSAS PARA VER LA PREGUNTA</span>`;
+                [1, 2, 5].forEach(v => document.getElementById(`bag-${v}`).classList.remove('ring-highlight'));
+            } else {
+                stepBadge.innerText = 'PASO 2: CONTAR Y RESPONDER';
+                stepBadge.className = 'bg-emerald-400 text-slate-950 font-extrabold text-xs sm:text-sm px-3 py-1 rounded-full animate-bounce';
+
+                if (targetQuestion.type === 'single') {
+                    const val = targetQuestion.value;
+                    questionDisplay.innerHTML = `
+                        <span>¿CUÁNTAS MONEDAS DE</span>
+                        <span class="inline-flex items-center justify-center w-11 h-11 rounded-full coin-${val} font-extrabold text-xl mx-1">$${val}</span>
+                        <span>HAY?</span>`;
+                    [1, 2, 5].forEach(v => {
+                        const b = document.getElementById(`bag-${v}`);
+                        if (b) v === val ? b.classList.add('ring-highlight') : b.classList.remove('ring-highlight');
+                    });
+                } else if (targetQuestion.type === 'total') {
+                    questionDisplay.innerHTML = `
+                        <span>¿CUÁNTAS MONEDAS HAY EN</span>
+                        <span class="text-amber-300 underline mx-1">TOTAL</span>
+                        <span>EN LAS 3 BOLSAS?</span>`;
+                } else if (targetQuestion.type === 'sum_bag') {
+                    const val = targetQuestion.value;
+                    questionDisplay.innerHTML = `
+                        <span>¿CUÁNTOS PESOS HAY EN LA BOLSA DE</span>
+                        <span class="inline-flex items-center justify-center w-11 h-11 rounded-full coin-${val} font-extrabold text-xl mx-1">$${val}</span>
+                        <span>?</span>`;
+                    [1, 2, 5].forEach(v => {
+                        const b = document.getElementById(`bag-${v}`);
+                        if (b) v === val ? b.classList.add('ring-highlight') : b.classList.remove('ring-highlight');
+                    });
+                } else { // sum_all
+                    questionDisplay.innerHTML = `
+                        <span>¿CUÁNTOS PESOS HAY EN</span>
+                        <span class="text-amber-300 underline mx-1">TOTAL</span>
+                        <span>EN LAS 3 BOLSAS?</span>`;
+                }
+            }
+        }
+
+        // ==========================================
+        // VERIFICAR RESPUESTA
+        // ==========================================
+        function checkNumberAnswer(chosen) {
+            if (!isSortingComplete) return;
+
+            if (chosen === targetQuestion.correctCount) {
+                playVictorySound();
+                stars++;
+                document.getElementById('starCount').innerText = stars;
+
+                let msg;
+                if (targetQuestion.type === 'single') {
+                    msg = `¡SÍ! ¡HAY ${chosen} ${chosen === 1 ? 'MONEDA' : 'MONEDAS'} DE $${targetQuestion.value}!`;
+                } else if (targetQuestion.type === 'total') {
+                    msg = `¡SÍ! ¡HAY ${chosen} MONEDAS EN TOTAL!`;
+                } else if (targetQuestion.type === 'sum_bag') {
+                    msg = `¡SÍ! ¡HAY $${chosen} EN LA BOLSA DE $${targetQuestion.value}!`;
+                } else {
+                    msg = `¡SÍ! ¡HAY $${chosen} EN TOTAL!`;
+                }
+
+                setGoblinMessage(msg);
+                speakText(msg);
+                document.getElementById('victoryMessage').innerText = msg;
+
+                // Mostrar modal de victoria
+                const modal = document.getElementById('victoryModal');
+                const config = LEVEL_CONFIGS[currentLevel - 1];
+                const isLastRoundOfLevel = (roundInLevel + 1) >= config.roundsToComplete;
+                const isLastLevel = currentLevel >= 6;
+
+                if (isLastRoundOfLevel) {
+                    if (isLastLevel) {
+                        document.getElementById('nextLevelInfo').classList.add('hidden');
+                        document.getElementById('victoryBtn').innerText = '🏅 VER MI PREMIO';
+                    } else {
+                        const nextCfg = LEVEL_CONFIGS[currentLevel]; // currentLevel is 1-indexed, so index = currentLevel
+                        document.getElementById('nextLevelInfo').innerText = `🎉 ¡Completaste el nivel ${currentLevel}! ¡Vas a pasar al NIVEL ${currentLevel + 1}!`;
+                        document.getElementById('nextLevelInfo').classList.remove('hidden');
+                        document.getElementById('victoryBtn').innerText = '🌟 ¡SIGUIENTE NIVEL!';
+                    }
+                } else {
+                    document.getElementById('nextLevelInfo').innerText = `Ronda ${roundInLevel + 1} de ${config.roundsToComplete} completada. ¡Seguí así!`;
+                    document.getElementById('nextLevelInfo').classList.remove('hidden');
+                    document.getElementById('victoryBtn').innerText = '🚀 SIGUIENTE RONDA';
+                }
+
+                modal.classList.add('show');
+            } else {
+                playErrorSound();
+                const btn = document.getElementById(`numBtn-${chosen}`);
+                if (btn) {
+                    btn.classList.add('shake-error', 'bg-rose-300');
+                    setTimeout(() => btn.classList.remove('shake-error', 'bg-rose-300'), 500);
+                }
+
+                let helpMsg;
+                if (targetQuestion.type === 'single') {
+                    helpMsg = `¡CASI! MIRÁ BIEN LA BOLSA DE $${targetQuestion.value} Y CONTÁ DE NUEVO.`;
+                } else if (targetQuestion.type === 'total') {
+                    helpMsg = `¡CASI! CONTÁ DE NUEVO TODAS LAS MONEDAS DE LAS BOLSAS.`;
+                } else if (targetQuestion.type === 'sum_bag') {
+                    helpMsg = `¡CASI! SUMÁ BIEN LAS MONEDAS DE $${targetQuestion.value}. ¿CUÁNTOS PESOS SON EN TOTAL?`;
+                } else {
+                    helpMsg = `¡CASI! SUMÁ BIEN TODAS LAS MONEDAS DE LAS 3 BOLSAS.`;
+                }
+                setGoblinMessage(helpMsg);
+                speakText(helpMsg);
+            }
+        }
+
+        // ==========================================
+        // AVANCE DE NIVEL
+        // ==========================================
+        function onVictoryNext() {
+            const modal = document.getElementById('victoryModal');
+            modal.classList.remove('show');
+
+            const config = LEVEL_CONFIGS[currentLevel - 1];
+            roundInLevel++;
+
+            if (roundInLevel >= config.roundsToComplete) {
+                // Nivel completado
+                roundInLevel = 0;
+                if (currentLevel >= 6) {
+                    // Juego completo
+                    showGameComplete();
+                } else {
+                    // Pasar al siguiente nivel
+                    showLevelCompleteModal();
+                }
+            } else {
+                // Siguiente ronda del mismo nivel
+                startNewRound();
+            }
+        }
+
+        function showLevelCompleteModal() {
+            playLevelUpSound();
+            const modal = document.getElementById('levelModal');
+            const nextLevel = currentLevel + 1;
+            document.getElementById('levelModalTitle').innerText = `¡NIVEL ${currentLevel} COMPLETADO!`;
+            document.getElementById('levelModalDesc').innerText =
+                `¡Excelente! ¡Pasás al Nivel ${nextLevel}! 🎊`;
+
+            // Mostrar estrellas ganadas
+            const starsEl = document.getElementById('levelStars');
+            starsEl.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const s = document.createElement('span');
+                s.className = 'text-4xl star-anim';
+                s.style.animationDelay = (i * 0.15) + 's';
+                s.innerText = '⭐';
+                starsEl.appendChild(s);
+            }
+
+            modal.classList.add('show');
+        }
+
+        function onLevelModalNext() {
+            const modal = document.getElementById('levelModal');
+            modal.classList.remove('show');
+            currentLevel++;
+            roundInLevel = 0;
+            startNewRound();
+        }
+
+        function showGameComplete() {
+            playLevelUpSound();
+            setTimeout(() => playLevelUpSound(), 600);
+            document.getElementById('finalStarsText').innerText = `⭐ Conseguiste ${stars} estrellas ⭐`;
+            document.getElementById('gameCompleteModal').classList.add('show');
+        }
+
+        function restartFullGame() {
+            currentLevel = 1;
+            roundInLevel = 0;
+            stars = 0;
+            document.getElementById('starCount').innerText = '0';
+            document.getElementById('gameCompleteModal').classList.remove('show');
+            startNewRound();
+        }
+
+        // ==========================================
+        // INICIO
+        // ==========================================
+        window.onload = () => {
+            buildNumberPad();
+            startNewRound();
+        };
+    </script>
+</body>
+</html>
